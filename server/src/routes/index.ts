@@ -10,6 +10,7 @@ import encashmentRoutes from './encashmentRoutes';
 import timesheetRoutes from './timesheetRoutes';
 import reportsRoutes from './reportsRoutes';
 import auditRoutes from './auditRoutes';
+import adminRoutes from './adminRoutes';
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.use('/encashment', encashmentRoutes);
 router.use('/timesheet', timesheetRoutes);
 router.use('/reports', reportsRoutes);
 router.use('/audit', auditRoutes);
+router.use('/admin', adminRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
