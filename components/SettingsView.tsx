@@ -900,7 +900,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                                               <AlertTriangle size={10} />
                                               Условие: 
                                               <b className="mx-1">{q.requireOnAnswer === 'yes' ? 'Да' : q.requireOnAnswer === 'no' ? 'Нет' : 'Всегда'}</b>
-                                               -> Требовать: 
+                                               {'->'} Требовать: 
                                               <span className="ml-1 font-bold">
                                                   {q.requirementType.map(t => t === 'photo' ? 'Фото' : 'Коммент').join(' + ')}
                                               </span>
