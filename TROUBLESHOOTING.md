@@ -1,5 +1,46 @@
 # ⚠️ Известные проблемы при деплое
 
+## 🔴 Проблема: Prisma OpenSSL error в Alpine Linux
+
+### Симптомы:
+```
+PrismaClientInitializationError: Unable to require `/app/node_modules/.prisma/client/libquery_engine-linux-musl.so.node`.
+Error: libssl.so.1.1: cannot open shared object file: No such file or directory
+```
+
+### Причина:
+- Alpine Linux использует OpenSSL 3.x, а Prisma искал OpenSSL 1.1.x
+- Неправильный `binaryTarget` в Prisma schema
+
+### ✅ Решение (уже исправлено):
+1. В `prisma/schema.prisma` добавлен правильный `binaryTarget`:
+   ```prisma
+   generator client {
+     provider      = "prisma-client-js"
+     binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+   }
+   ```
+
+2. В `Dockerfile` установлен OpenSSL 3:
+   ```dockerfile
+   RUN apk add --no-cache openssl libssl3
+   ```
+
+### Если проблема повторяется:
+1. **Проверьте binaryTargets в schema.prisma**
+2. **Очистите build cache на Render:**
+   - Dashboard → Service → Manual Deploy → Clear build cache & deploy
+3. **Регенерируйте Prisma Client локально:**
+   ```bash
+   cd server
+   npx prisma generate
+   git add .
+   git commit -m "Regenerate Prisma client"
+   git push
+   ```
+
+---
+
 ## Проблема: TypeScript compilation errors в Docker build
 
 ### Симптомы:
