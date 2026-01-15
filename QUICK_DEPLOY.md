@@ -35,6 +35,8 @@ git status  # Проверьте, что нет незакоммиченных �
 
 ## Шаг 4: Деплой Backend (2 минуты)
 
+### Вариант А: Docker (Alpine) - Рекомендуется ✅
+
 1. Нажмите **"New +"** → **"Web Service"**
 2. Выберите **"Build and deploy from a Git repository"**
 3. Найдите и выберите ваш репозиторий **RC2**
@@ -43,15 +45,8 @@ git status  # Проверьте, что нет незакоммиченных �
    - **Region:** Frankfurt
    - **Branch:** `main`
    - **Root Directory:** `server`
-   - **Runtime:** Node
-   - **Build Command:**
-     ```
-     npm install && npx prisma generate && npm run build
-     ```
-   - **Start Command:**
-     ```
-     npx prisma migrate deploy && npm start
-     ```
+   - **Runtime:** Docker
+   - **Dockerfile Path:** `Dockerfile` (по умолчанию)
    - **Instance Type:** Free
 
 5. Нажмите **"Advanced"** и добавьте Environment Variables:
@@ -68,6 +63,28 @@ git status  # Проверьте, что нет незакоммиченных �
 6. Нажмите **"Create Web Service"**
 7. ⏳ Подождите 5-7 минут пока деплоится
 8. **ВАЖНО:** Скопируйте URL backend (например: `https://rentcontrol-backend.onrender.com`)
+
+### Вариант Б: Native Node.js (если Docker не работает)
+
+Если у вас проблемы с Docker, используйте Native Environment:
+
+4. Заполните:
+   - **Name:** `rentcontrol-backend`
+   - **Region:** Frankfurt
+   - **Branch:** `main`
+   - **Root Directory:** `server`
+   - **Runtime:** Node
+   - **Build Command:**
+     ```
+     npm install && npx prisma generate && npm run build
+     ```
+   - **Start Command:**
+     ```
+     npx prisma migrate deploy && npm start
+     ```
+   - **Instance Type:** Free
+
+Остальные шаги такие же как в Варианте А.
 
 ## Шаг 5: Деплой Frontend (1 минута)
 
