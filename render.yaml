@@ -1,0 +1,44 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: rentcontrol-db
+    env: docker
+    plan: free
+    region: frankfurt
+    
+  # Backend API
+  - type: web
+    name: rentcontrol-backend
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: cd server && npm install && npx prisma generate && npm run build
+    startCommand: cd server && npx prisma migrate deploy && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rentcontrol-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        value: https://rentcontrol-frontend.onrender.com
+    healthCheckPath: /api/health
+
+  # Frontend (Static Site)
+  - type: web
+    name: rentcontrol-frontend
+    env: static
+    region: frankfurt
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://rentcontrol-backend.onrender.com

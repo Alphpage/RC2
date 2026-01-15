@@ -1,12 +1,13 @@
 {
-  "name": "rentcontrol-pro-(после-совещания)",
+  "name": "rentcontrol-pro",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && echo 'Frontend build complete!'"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
