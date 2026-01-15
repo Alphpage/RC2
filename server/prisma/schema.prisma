@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  SUPERVISOR
+}
+
+enum AuditType {
+  MORNING
+  EVENING
+}
+
+model User {
+  id        String   @id @default(uuid())
+  login     String   @unique
+  password  String
+  name      String
+  role      UserRole
+  assignedPointIds String[] // Array of point IDs for supervisors
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model RentalPoint {
+  id            String   @id @default(uuid())
+  name          String
+  salaryPercent Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cashRegisters      CashRegister[]
+  employees          Employee[]
+  revenueEntries     RevenueEntry[]
+  timesheetEntries   TimesheetEntry[]
+  encashmentEntries  EncashmentEntry[]
+  morningReports     MorningReport[]
+  eveningReports     EveningReport[]
+  pointSchedules     PointSchedule[]
+  employeeSchedules  EmployeeSchedule[]
+  auditReports       AuditReport[]
+
+  @@map("rental_points")
+}
+
+model CashRegister {
+  id      String @id @default(uuid())
+  pointId String
+  name    String
+
+  point             RentalPoint         @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  revenueEntries    RevenueEntry[]
+  encashmentEntries EncashmentEntry[]
+
+  @@map("cash_registers")
+}
+
+model Employee {
+  id         String  @id @default(uuid())
+  name       String
+  position   String
+  pointId    String
+  hourlyRate Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  point             RentalPoint        @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  timesheetEntries  TimesheetEntry[]
+  employeeSchedules EmployeeSchedule[]
+
+  @@map("employees")
+}
+
+model PointSchedule {
+  id        String   @id @default(uuid())
+  pointId   String
+  date      String // YYYY-MM-DD
+  openTime  String
+  closeTime String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  point RentalPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
+
+  @@unique([pointId, date])
+  @@map("point_schedules")
+}
+
+model EmployeeSchedule {
+  id         String   @id @default(uuid())
+  employeeId String
+  pointId    String
+  date       String // YYYY-MM-DD
+  startTime  String
+  endTime    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  employee Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  point    RentalPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date])
+  @@map("employee_schedules")
+}
+
+model RevenueEntry {
+  id         String   @id @default(uuid())
+  pointId    String
+  registerId String
+  date       String
+  cash       Float
+  card       Float
+  refundCash Float
+  refundCard Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  point    RentalPoint  @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  register CashRegister @relation(fields: [registerId], references: [id], onDelete: Cascade)
+
+  @@map("revenue_entries")
+}
+
+model TimesheetEntry {
+  id         String   @id @default(uuid())
+  pointId    String
+  employeeId String
+  date       String
+  hours      Float
+  startTime  String?
+  endTime    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  point    RentalPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  employee Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("timesheet_entries")
+}
+
+model EncashmentEntry {
+  id         String   @id @default(uuid())
+  pointId    String
+  registerId String
+  date       String
+  amount     Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  point    RentalPoint  @relation(fields: [pointId], references: [id], onDelete: Cascade)
+  register CashRegister @relation(fields: [registerId], references: [id], onDelete: Cascade)
+
+  @@map("encashment_entries")
+}
+
+model MorningReport {
+  id           String   @id @default(uuid())
+  pointId      String
+  date         String
+  openTime     String
+  employeeIds  String[] // Array of employee IDs
+  media        String[] // URLs or base64 strings
+  cashVerified Boolean
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  point RentalPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
+
+  @@unique([pointId, date])
+  @@map("morning_reports")
+}
+
+model EveningReport {
+  id           String   @id @default(uuid())
+  pointId      String
+  date         String
+  closeTime    String
+  cashVerified Boolean
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  point RentalPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
+
+  @@unique([pointId, date])
+  @@map("evening_reports")
+}
+
+model AuditQuestion {
+  id              String   @id @default(uuid())
+  text            String
+  type            AuditType
+  requireOnAnswer String?  // 'yes', 'no', 'always', or null
+  requirementType String[] // ['photo', 'comment']
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("audit_questions")
+}
+
+model AuditReport {
+  id        String    @id @default(uuid())
+  pointId   String
+  date      String
+  type      AuditType
+  answers   Json // Array of AuditAnswer objects
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  point RentalPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
+
+  @@unique([pointId, date, type])
+  @@map("audit_reports")
+}
