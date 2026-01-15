@@ -31,6 +31,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // @ts-ignore - JWT type issue with expiresIn
     const token = jwt.sign(
       {
         id: user.id,
