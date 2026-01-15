@@ -6,6 +6,22 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
+  // Check if database already has data
+  const userCount = await prisma.user.count();
+  const pointCount = await prisma.rentalPoint.count();
+
+  if (userCount > 0 && pointCount > 0) {
+    console.log('⏭️  Database already has data, skipping seed.');
+    console.log(`   Users: ${userCount}`);
+    console.log(`   Points: ${pointCount}`);
+    console.log('');
+    console.log('💡 If you want to re-seed, run: npx prisma migrate reset');
+    return;
+  }
+
+  console.log('📝 Database is empty, creating initial data...');
+  console.log('');
+
   // Create default users
   const users = [
     {
