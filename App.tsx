@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tab, RentalPoint, CashRegister, Employee, RevenueEntry, TimesheetEntry, EncashmentEntry, User, UserRole, MorningReport, EveningReport, PointSchedule, EmployeeSchedule, AuditQuestion, AuditReport } from './types';
 import Navigation from './components/Navigation';
 import Header from './components/Header';
@@ -10,6 +10,7 @@ import SalaryView from './components/SalaryView';
 import SettingsView from './components/SettingsView';
 import SchedulesView from './components/SchedulesView';
 import LoginView from './components/LoginView';
+import api from './services/apiClient';
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -66,19 +67,44 @@ const App: React.FC = () => {
     { id: 'eq2', text: 'Техника на зарядке?', requireOnAnswer: 'no', requirementType: ['comment'] }
   ]);
 
+  // Load data from API
+  useEffect(() => {
+    if (currentUser) {
+      loadDataFromAPI();
+    }
+  }, [currentUser]);
+
+  const loadDataFromAPI = async () => {
+    try {
+      const [pointsData, registersData, employeesData, usersData] = await Promise.all([
+        api.points.getAll(),
+        api.registers.getAll(),
+        api.employees.getAll(),
+        api.users.getAll(),
+      ]);
+      setPoints(pointsData);
+      setRegisters(registersData);
+      setEmployees(employeesData);
+      setUsers(usersData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  };
+
   // Auth Handlers
-  const handleLogin = (login: string, pass: string) => {
-    const user = users.find(u => u.login === login && u.password === pass);
-    if (user) {
-      setCurrentUser(user);
+  const handleLogin = async (login: string, pass: string) => {
+    try {
       setAuthError('');
+      const response = await api.auth.login(login, pass);
+      setCurrentUser(response.user);
       setActiveTab(Tab.POINTS);
-    } else {
-      setAuthError('Неверный логин или пароль');
+    } catch (error: any) {
+      setAuthError(error.message || 'Неверный логин или пароль');
     }
   };
 
   const handleLogout = () => {
+    api.auth.logout();
     setCurrentUser(null);
   };
 

@@ -72,17 +72,17 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin, error }) => {
             Демо доступы
           </p>
           <div className="grid grid-cols-3 gap-2">
-            <div className="bg-slate-50 p-2 rounded-lg text-center cursor-pointer hover:bg-slate-100" onClick={() => {setLogin('admin'); setPassword('admin');}}>
+            <div className="bg-slate-50 p-2 rounded-lg text-center cursor-pointer hover:bg-slate-100" onClick={() => {setLogin('admin'); setPassword('admin123');}}>
               <p className="text-xs font-bold text-slate-700">admin</p>
-              <p className="text-[9px] text-slate-400">Пароль: admin</p>
+              <p className="text-[9px] text-slate-400">admin123</p>
             </div>
-            <div className="bg-slate-50 p-2 rounded-lg text-center cursor-pointer hover:bg-slate-100" onClick={() => {setLogin('manager'); setPassword('manager');}}>
+            <div className="bg-slate-50 p-2 rounded-lg text-center cursor-pointer hover:bg-slate-100" onClick={() => {setLogin('manager'); setPassword('manager123');}}>
               <p className="text-xs font-bold text-slate-700">manager</p>
-              <p className="text-[9px] text-slate-400">Пароль: manager</p>
+              <p className="text-[9px] text-slate-400">manager123</p>
             </div>
-            <div className="bg-slate-50 p-2 rounded-lg text-center cursor-pointer hover:bg-slate-100" onClick={() => {setLogin('user'); setPassword('user');}}>
-              <p className="text-xs font-bold text-slate-700">user</p>
-              <p className="text-[9px] text-slate-400">Пароль: user</p>
+            <div className="bg-slate-50 p-2 rounded-lg text-center cursor-pointer hover:bg-slate-100" onClick={() => {setLogin('supervisor'); setPassword('supervisor123');}}>
+              <p className="text-xs font-bold text-slate-700">supervisor</p>
+              <p className="text-[9px] text-slate-400">supervisor123</p>
             </div>
           </div>
         </div>
