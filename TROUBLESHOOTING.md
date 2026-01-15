@@ -1,5 +1,31 @@
 # ⚠️ Известные проблемы при деплое
 
+## Проблема: TypeScript compilation errors в Docker build
+
+### Симптомы:
+```
+error TS2769: No overload matches this call
+error TS6133: 'param' is declared but its value is never read
+npm run build failed with exit code 2
+```
+
+### Причина:
+- JWT type definitions conflict с expiresIn parameter
+- Strict TypeScript settings (noUnusedLocals, noUnusedParameters)
+
+### ✅ Решение (уже исправлено):
+Исправлено в коммите `94b4292`:
+- Добавлен `@ts-ignore` для JWT type issue
+- Отключены `noUnusedLocals` и `noUnusedParameters` в tsconfig.json
+
+### Если проблема повторяется:
+Проверьте что у вас последняя версия кода:
+```bash
+git pull origin main
+```
+
+---
+
 ## Проблема: Docker build fails с "npm ci requires package-lock.json"
 
 ### Симптомы:
