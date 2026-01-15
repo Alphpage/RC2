@@ -1,5 +1,25 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// Определяем backend URL с fallback
+const getApiBaseUrl = () => {
+  // Приоритет 1: Environment variable (set in Render)
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Приоритет 2: Production backend на Render
+  // ВАЖНО: Замените на ваш реальный backend URL!
+  if (window.location.hostname.includes('onrender.com')) {
+    return 'https://rentcontrol-backend.onrender.com/api';
+  }
+  
+  // Приоритет 3: Localhost для разработки
+  return 'http://localhost:3001/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Логируем для отладки
+console.log('🔌 API Base URL:', API_BASE_URL);
 
 export const API_ENDPOINTS = {
   // Auth

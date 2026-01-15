@@ -39,17 +39,31 @@ async function apiFetch<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-    throw new ApiError(response.status, errorData.error || response.statusText);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new ApiError(response.status, errorData.error || response.statusText);
+    }
+
+    return response.json();
+  } catch (error: any) {
+    // Улучшенная обработка ошибок
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    
+    // Network errors
+    if (error.message === 'Failed to fetch') {
+      throw new ApiError(0, 'Не удалось подключиться к серверу. Проверьте интернет-соединение.');
+    }
+    
+    throw new ApiError(0, error.message || 'Неизвестная ошибка');
   }
-
-  return response.json();
 }
 
 // Auth API
