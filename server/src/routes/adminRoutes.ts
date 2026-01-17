@@ -215,7 +215,7 @@ router.post('/seed', async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     logger.error('Error seeding database via API:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Seed failed',
       message: error.message,
     });
@@ -244,7 +244,7 @@ router.get('/seed/status', async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
